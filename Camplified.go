@@ -19,7 +19,10 @@ type Configuration struct {
 
 func config() Configuration {
 
-	err := gonfig.GetConf("config.json", &Configuration{})
+	// get config from config.json
+	config := Configuration{}
+	err := gonfig.GetConf("config.json", &config)
+
 	if err != nil {
 		f, _ := os.Create("config.json")
 		s, _ := json.Marshal(Configuration{})
@@ -30,7 +33,7 @@ func config() Configuration {
 		os.Exit(0)
 	}
 
-	return Configuration{}
+	return config
 }
 
 func getAccessToken() string {
@@ -93,6 +96,7 @@ func main() {
 		_, _ = fmt.Scanln(&bid)
 
 		tm.Clear()
+
 		for {
 			data := getBeatmapInfo(bid, accessToken)
 			if data == nil {
