@@ -6,9 +6,12 @@ import (
 	tm "github.com/buger/goterm"
 	"github.com/tkanos/gonfig"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -18,8 +21,6 @@ type Configuration struct {
 }
 
 func config() Configuration {
-
-	// get config from config.json
 	config := Configuration{}
 	err := gonfig.GetConf("config.json", &config)
 
@@ -27,7 +28,9 @@ func config() Configuration {
 		f, _ := os.Create("config.json")
 		s, _ := json.Marshal(Configuration{})
 		_, _ = f.Write(s)
-		fmt.Println("Looks you are the first time to use this program, please fill the config.json file.")
+		fmt.Println("Looks you are the first time to use this program!")
+		fmt.Println("Please fill the config.json file with your API v2 ID and Secret.")
+		fmt.Println("Here's the quick link for you: https://osu.ppy.sh/home/account/edit#new-oauth-application")
 		fmt.Println("You can press any key to exit and reopen this.")
 		_, _ = fmt.Scanln()
 		os.Exit(0)
@@ -37,8 +40,6 @@ func config() Configuration {
 }
 
 func getAccessToken() string {
-	// get access_token from osu api v2
-
 	config := config()
 	params := url.Values{}
 	params.Add("client_id", config.CLIENT_ID)
@@ -103,6 +104,17 @@ func getBeatmapScores(bid string, accessToken string) []map[string]interface{} {
 	return scData
 }
 
+func subScoreCalculation(score int) string {
+	var subScore = strconv.Itoa(score)
+	if math.Abs(float64(score)) >= 1000 {
+		return "Away"
+	}
+	if score > 0 {
+		subScore = "+" + subScore
+	}
+	return subScore
+}
+
 func main() {
 	tm.Clear()
 
@@ -114,12 +126,19 @@ func main() {
 	}
 	fmt.Println("Get access token successful.")
 
+	kernet32 := syscall.NewLazyDLL("kernel32.dll")
+	Beep := kernet32.NewProc("Beep")
+
 	for {
 		fmt.Print("Input bid to start: ")
 		var bid string
 		_, _ = fmt.Scanln(&bid)
 
 		tm.Clear()
+
+		var data = getBeatmapInfo(bid, accessToken)
+		bsData := data["beatmapset"].(map[string]interface{})
+		var title = bsData["artist"].(string) + " - " + bsData["title"].(string) + " [" + data["version"].(string) + "]"
 
 		for {
 			data := getBeatmapInfo(bid, accessToken)
@@ -130,8 +149,6 @@ func main() {
 				break
 			}
 			status := data["status"].(string)
-			bsData := data["beatmapset"].(map[string]interface{})
-			title := bsData["artist"].(string) + " - " + bsData["title"].(string) + " [" + data["version"].(string) + "]"
 
 			tm.MoveCursor(1, 1)
 			_, _ = tm.Println(title)
@@ -142,35 +159,36 @@ func main() {
 			tm.Flush()
 
 			if status == "ranked" {
+				Beep.Call(1000, 500)
 				caughtTime := time.Now()
 
 				tm.MoveCursor(1, 4)
-				tm.Flush() // why flush here???
 
 				length := data["total_length"].(float64) / 1.5
+				bsData := data["beatmapset"].(map[string]interface{})
 				rankedTime, _ := time.Parse("2006-01-02T15:04:05Z", bsData["ranked_date"].(string))
 				submittable := rankedTime.Add(time.Duration(length) * time.Second)
 
-				_, _ = fmt.Printf("Ranked on %s (+%d)\n", rankedTime.Format("2006-01-02 15:04:05"), caughtTime.Sub(rankedTime).Milliseconds())
-				_, _ = fmt.Printf("Submittable at %s\n", submittable.Format("2006-01-02 15:04:05"))
+				_, _ = tm.Printf("Ranked on %s (+%d)\n", rankedTime.Format("2006-01-02 15:04:05"), caughtTime.Sub(rankedTime).Milliseconds())
+				_, _ = tm.Printf("Submittable at %s\n", submittable.Format("2006-01-02 15:04:05"))
 
 				tm.Flush()
 				duration := submittable.Sub(time.Now())
 
 				for duration > 0 {
 					tm.MoveCursor(1, 7)
-					tm.Flush()
-					fmt.Print("Submittable in ")
-					fmt.Print(tm.Color(duration.Round(time.Second).String(), tm.YELLOW))
+					_, _ = tm.Println("Submission accepted in", tm.Color(duration.Round(time.Second).String(), tm.YELLOW), "\t")
 					tm.Flush()
 					time.Sleep(time.Second)
 					duration = submittable.Sub(time.Now())
 				}
 
-				fmt.Println()
+				tm.MoveCursor(1, 7)
+				_, _ = tm.Println(tm.Color("Map accepted the score submission.", tm.GREEN))
+				tm.Println()
 				tm.Flush()
 
-				time.Sleep(10)
+				time.Sleep(time.Second * 5)
 
 				for {
 					scData := getBeatmapScores(bid, accessToken)
@@ -188,12 +206,12 @@ func main() {
 						if i != 0 {
 							subScore = int(score["id"].(float64) - scData[i-1]["id"].(float64))
 						}
-						fmt.Printf("%.0f\t(+%d)\t#%d\t%s\t%s\t\n", score["id"], subScore, i+1, score["rank"], user["username"])
+						_, _ = tm.Printf("%.0f\t(%s)\t#%d\t%s\t%s\t\n", score["id"], subScoreCalculation(subScore), i+1, score["rank"], user["username"])
 					}
 					break
 				}
 
-				fmt.Println()
+				tm.Println()
 				tm.Flush()
 				break
 			}
