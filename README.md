@@ -26,7 +26,7 @@ Campilfied's sound is based on Windows' ``kernel32.dll``'s [``Beep``](https://le
 
 See some weird code like ``[1;1H``, ``[2;4H`` in your terminal?
 
-Your Windows terminal seem doesn't enable the support of **ANSI escape sequences**.
+Your Windows seem doesn't enable the support of **ANSI escape sequences**.
 
 But you have multiple ways to fix it.
 
