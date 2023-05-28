@@ -32,7 +32,7 @@ Set-ItemProperty HKCU:\Console VirtualTerminalLevel -Type DWORD 1
 
 This command will change the registry value of ``VirtualTerminalLevel`` in ``HKEY_CURRENT_USER\Console\`` to ``1``. Aka enable the support of ANSI Terminal Control. Also change to ``0`` means disable.
 
-Learn more in [Windows console with ANSI colors handling - Stack Exchange](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling)
+Learn more in [Windows console with ANSI colors handling - Stack Exchange](https://superuser.com/a/1300251/1803960)
 
 ### Run Camplified in Mircosoft Terminal
 
