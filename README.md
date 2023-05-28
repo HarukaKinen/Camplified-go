@@ -14,6 +14,14 @@ Yet another osu! leaderboard camping program but simple implementation in Golang
 
 </div>
 
+## How does it work?
+
+An endless loop of API request to check map's status, and if the map is ranked, it will play a sound to notify you.
+
+### Sound Effect
+
+Campilfied's sound is based on Windows' ``kernel32.dll``'s ``Beep`` function. It's a simple and easy way to play sound without any external library. This is the first and **only** file that Campilfied need to touch.
+
 ## Troubleshooting
 
 See some weird code like ``[1;1H``, ``[2;4H`` in your terminal?
