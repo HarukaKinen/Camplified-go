@@ -1,6 +1,6 @@
-# Camplified (Deprecated)
+# Camplified-go (Deprecated)
 
-Camplified, an osu! leaderboard camping program but a simple implementation in Golang.
+Yet another osu! leaderboard camping program but a simple implementation in Golang.
 
 Currently the fastest osu! API v2 endless loop request in Synchronisation with native library implementation I've tried so far other than C.
 
