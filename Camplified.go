@@ -159,8 +159,8 @@ func main() {
 			tm.Flush()
 
 			if status == "ranked" {
-				Beep.Call(1000, 500)
 				caughtTime := time.Now()
+				Beep.Call(1000, 500)
 
 				tm.MoveCursor(1, 4)
 
