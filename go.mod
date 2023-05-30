@@ -8,8 +8,7 @@ require (
 )
 
 require (
-	github.com/akavel/rsrc v0.10.2 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
-	golang.org/x/sys v0.0.0-20210331175145-43e1dd70ce54 // indirect
+	golang.org/x/sys v0.0.0-20211123173158-ef496fb156ab // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

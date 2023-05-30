@@ -140,8 +140,14 @@ func main() {
 		bsData := data["beatmapset"].(map[string]interface{})
 		var title = bsData["artist"].(string) + " - " + bsData["title"].(string) + " [" + data["version"].(string) + "]"
 
+		tm.MoveCursor(1, 1)
+		_, _ = tm.Println(title)
+
+		tm.Flush()
+
+		var caughtTime time.Time
 		for {
-			data := getBeatmapInfo(bid, accessToken)
+			data = getBeatmapInfo(bid, accessToken)
 			if data == nil {
 				tm.MoveCursor(1, 1)
 				_, _ = tm.Println("Error: Invalid bid")
@@ -150,71 +156,78 @@ func main() {
 			}
 			status := data["status"].(string)
 
-			tm.MoveCursor(1, 1)
-			_, _ = tm.Println(title)
-
 			tm.MoveCursor(4, 2)
 			_, _ = tm.Println(status, time.Now())
 
 			tm.Flush()
 
 			if status == "ranked" {
-				caughtTime := time.Now()
+				caughtTime = time.Now()
 				Beep.Call(1000, 500)
-
-				tm.MoveCursor(1, 4)
-
-				length := data["total_length"].(float64) / 1.5
-				bsData := data["beatmapset"].(map[string]interface{})
-				rankedTime, _ := time.Parse("2006-01-02T15:04:05Z", bsData["ranked_date"].(string))
-				submittable := rankedTime.Add(time.Duration(length) * time.Second)
-
-				_, _ = tm.Printf("Ranked on %s (+%d)\n", rankedTime.Format("2006-01-02 15:04:05"), caughtTime.Sub(rankedTime).Milliseconds())
-				_, _ = tm.Printf("Submittable at %s\n", submittable.Format("2006-01-02 15:04:05"))
-
-				tm.Flush()
-				duration := submittable.Sub(time.Now())
-
-				for duration > 0 {
-					tm.MoveCursor(1, 7)
-					_, _ = tm.Println("Submission accepted in", tm.Color(duration.Round(time.Second).String(), tm.YELLOW), "\t")
-					tm.Flush()
-					time.Sleep(time.Second)
-					duration = submittable.Sub(time.Now())
-				}
-
-				tm.MoveCursor(1, 7)
-				_, _ = tm.Println(tm.Color("Map accepted the score submission.", tm.GREEN))
-				tm.Println()
-				tm.Flush()
-
-				time.Sleep(time.Second * 5)
-
-				for {
-					scData := getBeatmapScores(bid, accessToken)
-
-					if len(scData) == 0 {
-						continue
-					}
-
-					for i, score := range scData {
-						if i+1 == 9 {
-							break
-						}
-						user := score["user"].(map[string]interface{})
-						var subScore = 0
-						if i != 0 {
-							subScore = int(score["id"].(float64) - scData[i-1]["id"].(float64))
-						}
-						_, _ = tm.Printf("%.0f\t(%s)\t#%d\t%s\t%s\t\n", score["id"], subScoreCalculation(subScore), i+1, score["rank"], user["username"])
-					}
-					break
-				}
-
-				tm.Println()
-				tm.Flush()
 				break
 			}
+		}
+
+		tm.MoveCursor(1, 4)
+
+		length := data["total_length"].(float64) / 1.5
+		bsData = data["beatmapset"].(map[string]interface{})
+		rankedTime, _ := time.Parse("2006-01-02T15:04:05Z", bsData["ranked_date"].(string))
+		submittable := rankedTime.Add(time.Duration(length) * time.Second)
+
+		_, _ = tm.Printf("Ranked on %s (+%d)\n", rankedTime.Format("2006-01-02 15:04:05"), caughtTime.Sub(rankedTime).Milliseconds())
+		_, _ = tm.Printf("Submittable at %s\n", submittable.Format("2006-01-02 15:04:05"))
+
+		tm.Flush()
+		duration := submittable.Sub(time.Now())
+
+		for duration > 0 {
+			tm.MoveCursor(1, 7)
+			_, _ = tm.Println("Submission accepted in", tm.Color(duration.Round(time.Second).String(), tm.YELLOW), "\t")
+			tm.Flush()
+			time.Sleep(time.Second)
+			duration = submittable.Sub(time.Now())
+		}
+
+		tm.MoveCursor(1, 7)
+		_, _ = tm.Println(tm.Color("Map accepted the score submission.", tm.GREEN))
+		tm.Println()
+		tm.Flush()
+
+		time.Sleep(time.Second * 5)
+
+		_, _ = tm.Printf("Rank\tSubmission_ID\tDiff\tSec\tRank\tPlayer\n")
+
+		for {
+			scData := getBeatmapScores(bid, accessToken)
+
+			if len(scData) == 0 {
+				continue
+			}
+
+			for i, score := range scData {
+				if i+1 == 9 {
+					break
+				}
+				user := score["user"].(map[string]interface{})
+				var subScore = 0
+				if i != 0 {
+					subScore = int(score["id"].(float64) - scData[i-1]["id"].(float64))
+				}
+				createdTime, _ := time.Parse("2006-01-02T15:04:05Z", score["created_at"].(string))
+				subTime := createdTime.Sub(submittable).Seconds()
+				var subSeconds string
+				if subTime > 30 {
+					subSeconds = "Away"
+				} else {
+					subSeconds = "+" + strconv.Itoa(int(subTime)) + "s"
+				}
+				_, _ = tm.Printf("#%d\t%.0f\t(%s)\t%s\t%s\t%s\n", i+1, score["id"], subScoreCalculation(subScore), subSeconds, score["rank"], user["username"])
+			}
+
+			tm.Println()
+			tm.Flush()
+			break
 		}
 	}
 }
