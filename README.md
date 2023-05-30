@@ -12,6 +12,8 @@ Yet another osu! leaderboard camping program but simple implementation in Golang
 [![](https://img.shields.io/github/v/release/HarukaKinen/Camplified-go?style=for-the-badge)](https://github.com/HarukaKinen/Camplified-go/releases/latest)
 [![](https://img.shields.io/github/license/HarukaKinen/Camplified-go?style=for-the-badge)](https://github.com/HarukaKinen/Camplified-go/blob/main/LICENSE)
 
+[![DeepSource](https://app.deepsource.com/gh/HarukaKinen/Camplified-go.svg/?label=active+issues&show_trend=true&token=8SZvFbqeextkNRaPHU2ep_bV)](https://app.deepsource.com/gh/HarukaKinen/Camplified-go/?ref=repository-badge)
+
 </div>
 
 ## How does it work?
