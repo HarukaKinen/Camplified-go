@@ -8,9 +8,9 @@
 
 Yet another osu! leaderboard camping program but simple implementation in Golang
 
-![](https://img.shields.io/github/go-mod/go-version/HarukaKinen/Camplified-go/master?style=for-the-badge)
+[![](https://img.shields.io/github/go-mod/go-version/HarukaKinen/Camplified-go/master?style=for-the-badge)](https://go.dev/)
 [![](https://img.shields.io/github/v/release/HarukaKinen/Camplified-go?style=for-the-badge)](https://github.com/HarukaKinen/Camplified-go/releases/latest)
-![](https://img.shields.io/github/license/HarukaKinen/Camplified-go?style=for-the-badge)
+[![](https://img.shields.io/github/license/HarukaKinen/Camplified-go?style=for-the-badge)](https://github.com/HarukaKinen/Camplified-go/blob/main/LICENSE)
 
 </div>
 
