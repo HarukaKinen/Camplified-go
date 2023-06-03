@@ -26,6 +26,10 @@ An endless loop of API request to check map's status, if the map is ranked, it w
 
 Campilfied's sound is based on Windows' ``kernel32.dll``'s [``Beep``](https://learn.microsoft.com/en-us/windows/win32/api/utilapiset/nf-utilapiset-beep) function. This is a part of Windows API. If your Windows doesn't have ``kernel32.dll``, you **can't run** Campilfied. This should't be happen in most cases.
 
+#### No Sound?
+
+Make sure your **System Sound** is set to the correct volume and **Output Device**. The priority of the sound is the same as the Windows itself.
+
 ## Troubleshooting
 
 See some weird code like ``[1;1H``, ``[2;4H`` in your terminal?
