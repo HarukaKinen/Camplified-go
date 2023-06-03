@@ -20,6 +20,8 @@ Yet another osu! leaderboard camping program but simple implementation in Golang
 
 An endless loop of API request to check map's status, if the map is ranked, it will play a sound to notify you.
 
+***Camplified is not working with classic loved camping, program will not react to the LOVED status.***
+
 ### Sound Effect
 
 Campilfied's sound is based on Windows' ``kernel32.dll``'s [``Beep``](https://learn.microsoft.com/en-us/windows/win32/api/utilapiset/nf-utilapiset-beep) function. This is a part of Windows API. If your Windows doesn't have ``kernel32.dll``, you **can't run** Campilfied. This should't be happen in most cases.
