@@ -18,13 +18,13 @@ Yet another osu! leaderboard camping program but simple implementation in Golang
 
 ## How does it work?
 
-An endless loop of API request to check map's status, if the map is ranked, it will play a sound to notify you.
+An endless loop of API requests to check the map's status, if the map is ranked, it will play a sound to notify you.
 
-***Camplified is not working with classic loved camping, program will not react to the LOVED status.***
+***Camplified is not working with classic loved camping, the program will not react to the LOVED status.***
 
 ### Sound Effect
 
-Campilfied's sound is based on Windows' ``kernel32.dll``'s [``Beep``](https://learn.microsoft.com/en-us/windows/win32/api/utilapiset/nf-utilapiset-beep) function. This is a part of Windows API. If your Windows doesn't have ``kernel32.dll``, you **can't run** Campilfied. This should't be happen in most cases.
+Campilfied's sound is based on Windows' ``kernel32.dll``'s [``Beep``](https://learn.microsoft.com/en-us/windows/win32/api/utilapiset/nf-utilapiset-beep) function. This is a part of Windows API. If your Windows doesn't have ``kernel32.dll``, you **can't run** Campilfied. This shouldn't be happened in most cases.
 
 #### No Sound?
 
@@ -50,17 +50,17 @@ This command will change the registry value of ``VirtualTerminalLevel`` in ``HKE
 
 Learn more in [Windows console with ANSI colors handling - Stack Exchange](https://superuser.com/a/1300251/1803960)
 
-### Run Camplified in Mircosoft Terminal
+### Run Camplified in Microsoft Terminal
 
 Feel restless to edit the registry? Try [Microsoft Terminal](https://github.com/microsoft/terminal)
 
 - Get it from Microsoft Store: [Windows Terminal](https://aka.ms/terminal)
 - Download the latest release from [GitHub](https://github.com/microsoft/terminal/releases/latest)
-- You can also learn more about how to installing and running Windows Terminal in their [Github repository](https://github.com/microsoft/terminal#installing-and-running-windows-terminal)
+- You can also learn more about how to install and run Windows Terminal in their [Github repository](https://github.com/microsoft/terminal#installing-and-running-windows-terminal)
 
 After installing, you have multiple ways to run Camplified in Microsoft Terminal. We take a simple way here.
 
 1. Going to the directory of ``Camplified.exe``.
-2. Right click empty space and click ``Open in Windows Terminal``, or type ``wt`` in the address bar of File Explorer to open Microsoft Terminal in current directory.
+2. Right-click empty space and click ``Open in Windows Terminal``, or type ``wt`` in the address bar of File Explorer to open Microsoft Terminal in the current directory.
 3. Then type ``.\Camplified.exe`` to run Camplified.
 4. You're done!
