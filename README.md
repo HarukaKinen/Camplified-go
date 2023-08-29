@@ -22,6 +22,10 @@ An endless loop of API requests to check the map's status, if the map is ranked,
 
 ***Camplified is not working with classic loved camping, the program will not react to the LOVED status.***
 
+### Cloudflare WARP
+
+Camplified can now detect your Cloudflare WARP status to make sure your Wireguard service is connected to osu!'s domain. At the same time it recognizes exactly which Cloudflare Edge servers you've been assigned by Bancho.
+
 ### Sound Effect
 
 Campilfied's sound is based on Windows' ``kernel32.dll``'s [``Beep``](https://learn.microsoft.com/en-us/windows/win32/api/utilapiset/nf-utilapiset-beep) function. This is a part of Windows API. If your Windows doesn't have ``kernel32.dll``, you **can't run** Campilfied. This shouldn't be happened in most cases.

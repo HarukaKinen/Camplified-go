@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/biter777/countries"
 	tm "github.com/buger/goterm"
 	"github.com/tkanos/gonfig"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -31,6 +33,8 @@ func config() Configuration {
 		fmt.Println("Looks you are the first time to use this program!")
 		fmt.Println("Please fill the config.json file with your API v2 ID and Secret.")
 		fmt.Println("Here's the quick link for you: https://osu.ppy.sh/home/account/edit#new-oauth-application")
+		fmt.Println("DO NOT give your Secret Key to anyone but you.")
+		fmt.Println("Be careful about giving out your Secret Key when asking anyone for help.")
 		fmt.Println("You can press any key to exit and reopen this.")
 		_, _ = fmt.Scanln()
 		os.Exit(0)
@@ -115,16 +119,78 @@ func subScoreCalculation(score int) string {
 	return subScore
 }
 
+func GetLocation() (string, string, string, error) {
+	url := "https://osu.ppy.sh/cdn-cgi/trace/"
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", "", "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	lines := strings.Split(string(body), "\n")
+	loc := ""
+	colo := ""
+	warp := ""
+
+	for _, line := range lines {
+		parts := strings.Split(line, "=")
+		if len(parts) == 2 {
+			key := parts[0]
+			value := parts[1]
+			if key == "loc" {
+				loc = value
+			} else if key == "colo" {
+				colo = value
+			} else if key == "warp" {
+				warp = value
+			}
+		}
+	}
+	country := countries.ByName(loc).String()
+
+	return country, colo, warp, nil
+}
+
 func main() {
 	tm.Clear()
 
 	accessToken := getAccessToken()
 	if accessToken == "" {
 		fmt.Println("Error: Can't get access_token, please check your config.json file.")
+		fmt.Println("Please fill the config.json file with your API v2 ID and Secret.")
+		fmt.Println("Here's the quick link for you: https://osu.ppy.sh/home/account/edit#new-oauth-application")
+		fmt.Println("DO NOT give your Secret Key to anyone but you.")
+		fmt.Println("Be careful about giving out your Secret Key when asking anyone for help.")
+		fmt.Println("You can press any key to exit and reopen this.")
 		_, _ = fmt.Scanln()
 		os.Exit(0)
 	}
-	fmt.Println("Get access token successful.")
+
+	fmt.Println("Connected to Bancho Coordination Server:")
+	fmt.Println()
+
+	loc, colo, warp, err := GetLocation()
+	if err != nil {
+		fmt.Println("Cloudflare can't get your datacenter location.")
+		fmt.Println("This is not meaning you can't submit score, please make sure in osu! client.")
+	} else {
+		switch warp {
+		case "off":
+			fmt.Println("You are not using Cloudflare WARP; Cloudflare identified you in", loc)
+		case "on":
+			fmt.Println("You are using Cloudflare WARP; Cloudflare identified you in", loc)
+		case "plus":
+			fmt.Println("You are using Cloudflare WARP+; Cloudflare identified you in", loc)
+		}
+		fmt.Println("Bancho connected you to Cloudflare", colo, "Edge Server.")
+	}
+
+	fmt.Println()
 
 	kernet32 := syscall.NewLazyDLL("kernel32.dll")
 	Beep := kernet32.NewProc("Beep")
@@ -134,11 +200,10 @@ func main() {
 		var bid string
 		_, _ = fmt.Scanln(&bid)
 
-		tm.Clear()
-
 		var data = getBeatmapInfo(bid, accessToken)
 		bsData := data["beatmapset"].(map[string]interface{})
 		var title = bsData["artist"].(string) + " - " + bsData["title"].(string) + " [" + data["version"].(string) + "]"
+		var length = data["total_length"].(float64)
 
 		tm.MoveCursor(1, 1)
 		_, _ = tm.Println(title)
@@ -158,6 +223,8 @@ func main() {
 
 			tm.MoveCursor(4, 2)
 			_, _ = tm.Println(status, time.Now())
+			tm.MoveCursor(1, 3)
+			_, _ = tm.Println("Map length in second(s):", length/1.5, "("+strconv.Itoa(int(length))+" without DT)")
 
 			tm.Flush()
 
@@ -170,10 +237,9 @@ func main() {
 
 		tm.MoveCursor(1, 4)
 
-		length := data["total_length"].(float64) / 1.5
 		bsData = data["beatmapset"].(map[string]interface{})
 		rankedTime, _ := time.Parse("2006-01-02T15:04:05Z", bsData["ranked_date"].(string))
-		submittable := rankedTime.Add(time.Duration(length) * time.Second)
+		submittable := rankedTime.Add(time.Duration(length/1.5) * time.Second)
 
 		_, _ = tm.Printf("Ranked on %s (+%d)\n", rankedTime.Format("2006-01-02 15:04:05"), caughtTime.Sub(rankedTime).Milliseconds())
 		_, _ = tm.Printf("Submittable at %s\n", submittable.Format("2006-01-02 15:04:05"))
